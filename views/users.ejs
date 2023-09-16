@@ -1,0 +1,72 @@
+<%- include('./partials/header.ejs'); %>
+    <div class="manageUser-container">
+      <div id="title">
+        <h2>Manage Users</h2>
+      </div>
+
+      <div class="new-message-container new-user">
+        <a href="#" onclick="openModal()">+</a>
+      </div>
+
+      <div id="users-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Manage</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <% users.forEach(function(user) { %>
+              <tr id="<%= user._id %>">
+                <td class="name">
+                  <% if (user.avatar) { %>
+                    <img src="./uploads/avatars/<%= user.avatar %>" />
+                  <% } else { %>
+                    <img src="./images/nophoto.png" />
+                    <% } %>
+                  <span><%= user.name %></span>
+                </td>
+                <td><%= user.email %></td>
+                <td class="manage">
+                  <img src="./images/trash.png" alt="Delete" onclick="deleteUser('<%= user._id %>')"/>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%- include('./partials/add-user-modal.ejs'); %>
+
+    <script>
+        // toasts
+        const deleteToast = Toastify({
+            text: "User was deleted successfully!",
+            duration: 3000,
+        });
+
+        const deleteErrorToast = Toastify({
+            text: "Could not delete the user!",
+            duration: 3000,
+        });
+        
+        // delete user function
+        async function deleteUser(userId) {
+            let response = await fetch(`/users/${userId}`, {
+                method: "DELETE",
+            });
+
+            let result = await response.json();
+
+            if (result.errors) {
+                deleteErrorToast.showToast();
+            } else {
+                deleteToast.showToast();
+                document.getElementById(userId).remove();
+            }
+        }
+    </script>
+  </body>
+</html>
